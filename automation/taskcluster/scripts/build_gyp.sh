@@ -8,10 +8,10 @@ test -n "${VCS_PATH}"
 
 # builds write to the source dir (and its parent), so move the source trees to
 # our workspace from the (cached) checkout dir
-cp -a "${VCS_PATH}/nspr" "${VCS_PATH}/nss" .
+cp -a "${VCS_PATH}/nss" .
+"$(dirname "$0")/clone_nspr.sh"
 
 pushd nspr
-hg revert --all
 if [ -f "../nss/nspr.patch" ] && [ "$ALLOW_NSPR_PATCH" = "1" ]; then
   patch -p1 < ../nss/nspr.patch
 fi
@@ -22,23 +22,17 @@ popd
 # The setup is hardcoded and can't be changed easily.
 # This part is a helper We install dependencies manually to help.
 if [ "$(uname)" = "Darwin" ]; then
-  python3 -m pip install --user gyp-next
-  python3 -m pip install --user ninja
-  export PATH="$(python3 -m site --user-base)/bin:${PATH}"
+  . "$(dirname "$0")/install_gyp.sh"
+  install_gyp gyp-env ninja
 fi
 
 # Build.
 nss/build.sh -g -v --enable-libpkix -Denable_draft_hpke=1 "$@"
 
 # Package.
-if [ "$(uname)" = "Darwin" ]; then
-  mkdir -p public
-  tar cvfjh public/dist.tar.bz2 dist
+if [ "$(uname)" = Linux ]; then
+  ln -s /builds/worker/artifacts artifacts
 else
-  if [ "$(uname)" = Linux ]; then
-    ln -s /builds/worker/artifacts artifacts
-  else
-    mkdir artifacts
-  fi
-  tar cvfjh artifacts/dist.tar.bz2 dist
+  mkdir -p artifacts
 fi
+tar cvfjh artifacts/dist.tar.bz2 dist

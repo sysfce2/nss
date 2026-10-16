@@ -14,23 +14,23 @@
 #include <vector>
 #include "secoidt.h"
 #include "pkcs11t.h"
+#include "kyber.h"
 
 typedef struct AesCbcTestVectorStr {
-  uint32_t id;
-  std::string key;
-  std::string msg;
-  std::string iv;
-  std::string ciphertext;
+  uint64_t id;
+  std::vector<uint8_t> key;
+  std::vector<uint8_t> msg;
+  std::vector<uint8_t> iv;
+  std::vector<uint8_t> ciphertext;
   bool valid;
 } AesCbcTestVector;
 
 typedef struct AesCmacTestVectorStr {
-  uint32_t id;
-  std::string comment;
-  std::string key;
-  std::string msg;
-  std::string tag;
-  bool invalid;
+  uint64_t id;
+  std::vector<uint8_t> key;
+  std::vector<uint8_t> msg;
+  std::vector<uint8_t> tag;
+  bool valid;
 } AesCmacTestVector;
 typedef AesCmacTestVector HmacTestVector;
 
@@ -57,6 +57,33 @@ typedef struct ChaChaTestVectorStr {
   bool invalid_tag;
   bool invalid_iv;
 } ChaChaTestVector;
+
+typedef struct MlKemKeyGenTestVectorStr {
+  uint32_t id;
+  KyberParams params;
+  std::vector<uint8_t> seed;
+  std::vector<uint8_t> publicKeyDigest;
+  std::vector<uint8_t> privateKeyDigest;
+} MlKemKeyGenTestVector;
+
+typedef struct MlKemEncapTestVectorStr {
+  uint32_t id;
+  KyberParams params;
+  std::vector<uint8_t> entropy;
+  std::vector<uint8_t> publicKey;
+  std::vector<uint8_t> cipherTextDigest;
+  std::vector<uint8_t> secret;
+  bool expectedResult;
+} MlKemEncapTestVector;
+
+typedef struct MlKemDecapTestVectorStr {
+  uint32_t id;
+  KyberParams params;
+  std::vector<uint8_t> privateKey;
+  std::vector<uint8_t> cipherText;
+  std::vector<uint8_t> secret;
+  bool expectedResult;
+} MlKemDecapTestVector;
 
 typedef struct EcdsaTestVectorStr {
   SECOidTag hash_oid;
@@ -87,11 +114,11 @@ typedef struct EcdhTestVectorStr {
 } EcdhTestVector;
 
 typedef struct HkdfTestVectorStr {
-  uint32_t id;
-  std::string ikm;
-  std::string salt;
-  std::string info;
-  std::string okm;
+  uint64_t id;
+  std::vector<uint8_t> ikm;
+  std::vector<uint8_t> salt;
+  std::vector<uint8_t> info;
+  std::vector<uint8_t> okm;
   uint32_t size;
   bool valid;
 } HkdfTestVector;
